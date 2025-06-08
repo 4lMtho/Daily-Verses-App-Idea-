@@ -1,0 +1,30 @@
+name: Daily Bible Verse Update
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Runs daily at 6:00 AM UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  update-verse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Run fetch-verse script
+        run: node fetch-verse.js
+
+      - name: Commit and push verse
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add verse-of-the-day.json
+          git commit -m "chore: update verse of the day" || echo "No changes to commit"
+          git push
